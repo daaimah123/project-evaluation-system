@@ -5,6 +5,10 @@ const rateLimit = require("express-rate-limit")
 require("dotenv").config()
 
 const errorHandler = require("./middleware/errorHandler")
+const authRoutes = require("./routes/auth")
+const projectRoutes = require("./routes/projects")
+const submissionRoutes = require("./routes/submissions")
+const participantRoutes = require("./routes/participants")
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -41,7 +45,12 @@ app.get("/health", (req, res) => {
   })
 })
 
-// API Routes will be added here
+// API Routes
+app.use("/api/auth", authRoutes)
+app.use("/api/projects", projectRoutes)
+app.use("/api/submissions", submissionRoutes)
+app.use("/api/participants", participantRoutes)
+
 app.get("/api", (req, res) => {
   res.json({
     message: "Project Evaluation System API",
@@ -54,6 +63,6 @@ app.use(errorHandler)
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`)
+  console.log(`[v0] Server running on port ${PORT}`)
+  console.log(`[v0] Environment: ${process.env.NODE_ENV || "development"}`)
 })

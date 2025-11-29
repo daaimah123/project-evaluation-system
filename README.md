@@ -107,4 +107,6 @@ npm run dev
 - [ ] Phase 11: Polish and deploy
 - [ ] Phase 12: Testing and launch
 
-## MIT License
+## License
+
+MIT 
