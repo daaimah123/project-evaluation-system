@@ -13,12 +13,12 @@ A PERN stack application for evaluating full-stack software engineering particip
 
 ## Project Structure
 
-\`\`\`
+```
 project-evaluation-system/
 ├── client/          # React frontend (Vite)
 ├── server/          # Express backend
 └── database/        # SQL migrations and seeds
-\`\`\`
+```
 
 ## Getting Started
 
@@ -32,7 +32,7 @@ project-evaluation-system/
 ### Setup
 
 1. **Clone and install dependencies:**
-\`\`\`bash
+```bash
 # Install backend dependencies
 cd server
 npm install
@@ -40,10 +40,10 @@ npm install
 # Install frontend dependencies
 cd ../client
 npm install
-\`\`\`
+```
 
 2. **Database setup:**
-\`\`\`bash
+```bash
 # Create database
 createdb evaluations_dev
 
@@ -52,10 +52,10 @@ psql -d evaluations_dev -f database/migrations/001_create_tables.sql
 
 # Optional: Add sample data
 psql -d evaluations_dev -f database/seeds/sample_data.sql
-\`\`\`
+```
 
 3. **Environment variables:**
-\`\`\`bash
+```bash
 # Backend
 cp server/.env.example server/.env
 # Edit server/.env with your credentials
@@ -63,10 +63,10 @@ cp server/.env.example server/.env
 # Frontend
 cp client/.env.example client/.env
 # Edit client/.env with your API URL
-\`\`\`
+```
 
 4. **Run development servers:**
-\`\`\`bash
+```bash
 # Terminal 1: Backend
 cd server
 npm run dev
@@ -74,7 +74,7 @@ npm run dev
 # Terminal 2: Frontend
 cd client
 npm run dev
-\`\`\`
+```
 
 5. **Access the application:**
 - Frontend: http://localhost:3000
@@ -107,6 +107,4 @@ npm run dev
 - [ ] Phase 11: Polish and deploy
 - [ ] Phase 12: Testing and launch
 
-## License
-
-MIT
+## MIT License
