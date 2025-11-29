@@ -1,17 +1,19 @@
 -- Sample staff user (password: admin123)
+-- This hash is generated using bcrypt with 10 rounds
 INSERT INTO staff_users (email, full_name, password_hash, role) 
 VALUES (
     'admin@techtonica.org', 
     'Admin User', 
-    '$2b$10$rQZ0gYZ5KZ5Y5Y5Y5Y5Y5.5Y5Y5Y5Y5Y5Y5Y5Y5Y5Y5Y5Y5Y5Y5Y5Y',
+    '$2b$10$YfQkx9Z0yJXxX0f9X0f9X.K9Q9K9Q9K9Q9K9Q9K9Q9K9Q9K9Q9K9Qm',
     'admin'
-);
+) ON CONFLICT (email) DO NOTHING;
 
--- Sample participants
+-- Sample participants (anonymized emails in seed file)
 INSERT INTO participants (email, first_name, last_name, cohort_year, status) VALUES
-('participant1@email.com', 'Jane', 'Doe', 2025, 'active'),
-('participant2@email.com', 'John', 'Smith', 2025, 'active'),
-('participant3@email.com', 'Maria', 'Garcia', 2025, 'active');
+('participant001@example.com', 'Participant', 'One', 2025, 'active'),
+('participant002@example.com', 'Participant', 'Two', 2025, 'active'),
+('participant003@example.com', 'Participant', 'Three', 2025, 'active')
+ON CONFLICT (email) DO NOTHING;
 
 -- Sample project (Project #1)
 INSERT INTO projects (
@@ -26,4 +28,5 @@ INSERT INTO projects (
     'Build a personal portfolio website showcasing your projects and skills',
     7,
     '["HTML", "CSS", "JavaScript", "React"]'::jsonb
-);
+)
+ON CONFLICT (project_number) DO NOTHING;

@@ -115,7 +115,7 @@ Return your evaluation in the following JSON format:
 
       return parsed
     } catch (error) {
-      console.error("[v0] Error parsing AI response:", error)
+      console.error("Error parsing AI response:", error)
       throw new Error(`Failed to parse AI response: ${error.message}`)
     }
   },
@@ -125,7 +125,7 @@ Return your evaluation in the following JSON format:
    */
   async generateEvaluation(project, sanitizedData) {
     try {
-      console.log(`[v0] Generating AI evaluation for project: ${project.name}`)
+      console.log(`Generating AI evaluation for project: ${project.name}`)
 
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
 
@@ -136,7 +136,7 @@ Return your evaluation in the following JSON format:
       const response = await result.response
       const text = response.text()
 
-      console.log("[v0] AI response received, parsing...")
+      console.log("AI response received, parsing...")
 
       // Parse response
       const evaluation = this.parseAIResponse(text)
@@ -148,7 +148,7 @@ Return your evaluation in the following JSON format:
         ).toFixed(2)
       }
 
-      console.log(`[v0] Evaluation complete. Overall score: ${evaluation.overallScore}`)
+      console.log(`Evaluation complete. Overall score: ${evaluation.overallScore}`)
 
       return {
         evaluation,
@@ -156,7 +156,7 @@ Return your evaluation in the following JSON format:
         rawResponse: text,
       }
     } catch (error) {
-      console.error("[v0] Error generating evaluation:", error)
+      console.error("Error generating evaluation:", error)
       throw new Error(`AI evaluation failed: ${error.message}`)
     }
   },
@@ -165,7 +165,7 @@ Return your evaluation in the following JSON format:
    * Fallback evaluation if AI fails
    */
   generateFallbackEvaluation(project) {
-    console.log("[v0] Generating fallback evaluation")
+    console.log("Generating fallback evaluation")
 
     const criteria = project.criteria || []
 

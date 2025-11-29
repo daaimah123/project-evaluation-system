@@ -51,7 +51,7 @@ const githubService = {
     try {
       const { owner, repo } = this.parseGitHubUrl(repoUrl)
 
-      console.log(`[v0] Checking access for ${owner}/${repo}`)
+      console.log(`Checking access for ${owner}/${repo}`)
 
       try {
         const response = await octokit.repos.get({
@@ -70,7 +70,7 @@ const githubService = {
       } catch (error) {
         if (error.status === 404) {
           // Could be private without access, or doesn't exist
-          console.log(`[v0] Repository not accessible: ${owner}/${repo}`)
+          console.log(`Repository not accessible: ${owner}/${repo}`)
           return {
             accessible: false,
             isPrivate: true,
@@ -82,7 +82,7 @@ const githubService = {
         }
 
         if (error.status === 403) {
-          console.log(`[v0] Rate limit or forbidden: ${owner}/${repo}`)
+          console.log(`Rate limit or forbidden: ${owner}/${repo}`)
           return {
             accessible: false,
             isPrivate: true,
@@ -96,7 +96,7 @@ const githubService = {
         throw error
       }
     } catch (error) {
-      console.error("[v0] Error checking repo access:", error)
+      console.error("Error checking repo access:", error)
       throw error
     }
   },
@@ -108,7 +108,7 @@ const githubService = {
     const clonePath = path.join("/tmp", "repos", submissionId)
 
     try {
-      console.log(`[v0] Cloning repository to ${clonePath}`)
+      console.log(`Cloning repository to ${clonePath}`)
 
       // Ensure directory doesn't exist
       await this.deleteRepository(clonePath)
@@ -122,11 +122,11 @@ const githubService = {
       const git = simpleGit()
       await git.clone(authUrl, clonePath, ["--depth", "1"])
 
-      console.log(`[v0] Repository cloned successfully to ${clonePath}`)
+      console.log(`Repository cloned successfully to ${clonePath}`)
 
       return clonePath
     } catch (error) {
-      console.error("[v0] Error cloning repository:", error)
+      console.error("Error cloning repository:", error)
       // Clean up on failure
       await this.deleteRepository(clonePath)
       throw new Error(`Failed to clone repository: ${error.message}`)
@@ -153,7 +153,7 @@ const githubService = {
     try {
       const git = simpleGit(repoPath)
 
-      console.log(`[v0] Analyzing commit history in ${repoPath}`)
+      console.log(`Analyzing commit history in ${repoPath}`)
 
       // Get all commits
       const log = await git.log()
@@ -198,7 +198,7 @@ const githubService = {
         commitsPerDay: commits.length / (daysDiff || 1),
       }
     } catch (error) {
-      console.error("[v0] Error analyzing commit history:", error)
+      console.error("Error analyzing commit history:", error)
       throw new Error(`Failed to analyze commits: ${error.message}`)
     }
   },
@@ -210,7 +210,7 @@ const githubService = {
     try {
       const git = simpleGit(repoPath)
 
-      console.log(`[v0] Analyzing branches in ${repoPath}`)
+      console.log(`Analyzing branches in ${repoPath}`)
 
       // Get all branches
       const branches = await git.branch(["-a"])
@@ -230,7 +230,7 @@ const githubService = {
         branchNames: branches.all,
       }
     } catch (error) {
-      console.error("[v0] Error analyzing branches:", error)
+      console.error("Error analyzing branches:", error)
       throw new Error(`Failed to analyze branches: ${error.message}`)
     }
   },
@@ -265,7 +265,7 @@ const githubService = {
       await walk(repoPath)
       return files
     } catch (error) {
-      console.error("[v0] Error listing files:", error)
+      console.error("Error listing files:", error)
       throw new Error(`Failed to list files: ${error.message}`)
     }
   },
@@ -279,7 +279,7 @@ const githubService = {
       const content = await fs.readFile(fullPath, "utf-8")
       return content
     } catch (error) {
-      console.error(`[v0] Error reading file ${filePath}:`, error)
+      console.error(`Error reading file ${filePath}:`, error)
       return null
     }
   },
@@ -290,11 +290,11 @@ const githubService = {
   async deleteRepository(repoPath) {
     try {
       await fs.rm(repoPath, { recursive: true, force: true })
-      console.log(`[v0] Deleted repository at ${repoPath}`)
+      console.log(`Deleted repository at ${repoPath}`)
     } catch (error) {
       // Ignore errors if directory doesn't exist
       if (error.code !== "ENOENT") {
-        console.error("[v0] Error deleting repository:", error)
+        console.error("Error deleting repository:", error)
       }
     }
   },

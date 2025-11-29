@@ -29,7 +29,7 @@ const sanitizationService = {
 
     // Skip binary files or very large files
     if (code.length > 50000) {
-      console.log(`[v0] Skipping large file: ${filePath}`)
+      console.log(`Skipping large file: ${filePath}`)
       return null
     }
 

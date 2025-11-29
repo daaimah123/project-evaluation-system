@@ -63,6 +63,6 @@ app.use(errorHandler)
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`[v0] Server running on port ${PORT}`)
-  console.log(`[v0] Environment: ${process.env.NODE_ENV || "development"}`)
+  console.log(`Server running on port ${PORT}`)
+  console.log(`Environment: ${process.env.NODE_ENV || "development"}`)
 })

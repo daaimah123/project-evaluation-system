@@ -20,7 +20,7 @@ const queueService = {
     }
 
     queue.push(job)
-    console.log(`[v0] Added submission ${submissionId} to evaluation queue. Queue size: ${queue.length}`)
+    console.log(`Added submission ${submissionId} to evaluation queue. Queue size: ${queue.length}`)
 
     return job
   },
@@ -36,7 +36,7 @@ const queueService = {
       job.status = "processing"
       job.startedAt = new Date()
       processing.add(job.submissionId)
-      console.log(`[v0] Processing job: ${job.submissionId}`)
+      console.log(`Processing job: ${job.submissionId}`)
     }
 
     return job
@@ -52,7 +52,7 @@ const queueService = {
       queue.splice(index, 1)
       processing.delete(submissionId)
 
-      console.log(`[v0] Job ${submissionId} completed (${success ? "success" : "failed"}). Queue size: ${queue.length}`)
+      console.log(`Job ${submissionId} completed (${success ? "success" : "failed"}). Queue size: ${queue.length}`)
     }
   },
 
@@ -70,13 +70,13 @@ const queueService = {
 
       // Remove job if too many attempts
       if (job.attempts >= 3) {
-        console.error(`[v0] Job ${submissionId} failed after ${job.attempts} attempts. Removing from queue.`)
+        console.error(`Job ${submissionId} failed after ${job.attempts} attempts. Removing from queue.`)
         const index = queue.findIndex((j) => j.submissionId === submissionId)
         if (index !== -1) {
           queue.splice(index, 1)
         }
       } else {
-        console.log(`[v0] Job ${submissionId} failed. Attempt ${job.attempts}/3. Will retry.`)
+        console.log(`Job ${submissionId} failed. Attempt ${job.attempts}/3. Will retry.`)
       }
     }
   },
