@@ -60,7 +60,7 @@ class EvaluationWorker {
       return
     }
 
-    console.log(`Processing evaluation for submission: ${job.submissionId}`)
+    console.log(`Processing job: ${job.submissionId}`)
 
     try {
       await this.evaluateSubmission(job.submissionId)
@@ -69,8 +69,8 @@ class EvaluationWorker {
       console.error(`Evaluation failed for submission ${job.submissionId}:`, error)
       queueService.failJob(job.submissionId, error)
 
-      // Update submission status to error
-      await Submission.updateStatus(job.submissionId, "evaluation_failed")
+      // Keep submission in pending state so it can be retried
+      await Submission.updateStatus(job.submissionId, "pending")
     }
   }
 
@@ -93,7 +93,7 @@ class EvaluationWorker {
       throw new Error("Project not found")
     }
 
-    console.log(`Analyzing repository: ${submission.github_repo_url}`)
+    console.log(`🔦Analyzing repository: ${submission.github_repo_url}`)
 
     // Step 1: Clone and analyze repository
     const repoAnalysis = await githubService.analyzeRepository(submission.github_repo_url, submissionId)
@@ -108,13 +108,13 @@ class EvaluationWorker {
       }
     }
 
-    console.log(`Read ${Object.keys(fileContents).length} files from repository`)
+    console.log(`📚Read ${Object.keys(fileContents).length} files from repository`)
 
     // Step 3: Sanitize data for AI
     const sanitizedData = await sanitizationService.sanitizeRepository(repoAnalysis, fileContents)
 
     console.log(
-      `Sanitization complete. Removed ${sanitizedData.piiDetected.emails} emails, ${sanitizedData.piiDetected.phones} phones, ${sanitizedData.piiDetected.names} names`,
+      `🧹Sanitization complete. Removed ${sanitizedData.piiDetected.emails} emails, ${sanitizedData.piiDetected.phones} phones, ${sanitizedData.piiDetected.names} names`,
     )
 
     // Step 4: Generate AI evaluation
@@ -159,7 +159,7 @@ class EvaluationWorker {
     // Step 8: Update submission status
     await Submission.updateStatus(submissionId, "ai_complete")
 
-    console.log(`Evaluation complete for submission ${submissionId}. Score: ${evaluation.overall_score}`)
+    console.log(`✅Evaluation complete for submission ${submissionId}. Score: ${evaluation.overall_score}`)
   }
 }
 
