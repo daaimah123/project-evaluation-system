@@ -22,7 +22,7 @@ class EvaluationWorker {
    */
   start() {
     if (this.isRunning) {
-      console.log("Evaluation worker already running")
+      console.log("🏃🏽‍♀️Evaluation worker already running")
       return
     }
 
@@ -47,7 +47,7 @@ class EvaluationWorker {
       this.interval = null
     }
     this.isRunning = false
-    console.log("Evaluation worker stopped")
+    console.log("🛑Evaluation worker stopped")
   }
 
   /**
@@ -122,7 +122,7 @@ class EvaluationWorker {
     try {
       aiResult = await evaluationService.generateEvaluation(project, sanitizedData)
     } catch (error) {
-      console.error("AI evaluation failed, using fallback:", error)
+      console.error("⚠️AI evaluation failed, using fallback:", error)
       aiResult = evaluationService.generateFallbackEvaluation(project)
     }
 

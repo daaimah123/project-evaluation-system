@@ -24,11 +24,11 @@ async function testConnection() {
 
 // Test connection
 pool.on("connect", () => {
-  console.log("Database client connected")
+  console.log("🔌Database client connected")
 })
 
 pool.on("error", (err) => {
-  console.error("Unexpected database error:", err)
+  console.error("😮Unexpected database error:", err)
   process.exit(-1)
 })
 

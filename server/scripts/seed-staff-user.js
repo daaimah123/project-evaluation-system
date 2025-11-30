@@ -36,7 +36,7 @@ async function seedStaffUser() {
 
     await pool.end()
   } catch (error) {
-    console.error("Error seeding staff user:", error)
+    console.error("❌Error seeding staff user:", error)
     process.exit(1)
   }
 }

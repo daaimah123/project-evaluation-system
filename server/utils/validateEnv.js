@@ -34,9 +34,9 @@ function validateEnv() {
 
   // Report results
   if (missing.length > 0) {
-    console.error("\n❌MISSING REQUIRED ENVIRONMENT VARIABLES:\n")
+    console.error("\n⚠️MISSING REQUIRED ENVIRONMENT VARIABLES:\n")
     missing.forEach((msg) => console.error(`  - ${msg}`))
-    console.error("\nPlease set these in your .env file\n")
+    console.error("\n⚠️Please set these in your .env file\n")
     process.exit(1)
   }
 

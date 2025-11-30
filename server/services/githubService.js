@@ -96,7 +96,7 @@ const githubService = {
         throw error
       }
     } catch (error) {
-      console.error("Error checking repo access:", error)
+      console.error("❌Error checking repo access:", error)
       throw error
     }
   },
@@ -126,7 +126,7 @@ const githubService = {
 
       return clonePath
     } catch (error) {
-      console.error("Error cloning repository:", error)
+      console.error("❌Error cloning repository:", error)
       // Clean up on failure
       await this.deleteRepository(clonePath)
       throw new Error(`Failed to clone repository: ${error.message}`)
@@ -198,7 +198,7 @@ const githubService = {
         commitsPerDay: commits.length / (daysDiff || 1),
       }
     } catch (error) {
-      console.error("Error analyzing commit history:", error)
+      console.error("❌Error analyzing commit history:", error)
       throw new Error(`Failed to analyze commits: ${error.message}`)
     }
   },
@@ -230,7 +230,7 @@ const githubService = {
         branchNames: branches.all,
       }
     } catch (error) {
-      console.error("Error analyzing branches:", error)
+      console.error("❌Error analyzing branches:", error)
       throw new Error(`Failed to analyze branches: ${error.message}`)
     }
   },
@@ -265,7 +265,7 @@ const githubService = {
       await walk(repoPath)
       return files
     } catch (error) {
-      console.error("Error listing files:", error)
+      console.error("❌Error listing files:", error)
       throw new Error(`Failed to list files: ${error.message}`)
     }
   },
@@ -294,7 +294,7 @@ const githubService = {
     } catch (error) {
       // Ignore errors if directory doesn't exist
       if (error.code !== "ENOENT") {
-        console.error("Error deleting repository:", error)
+        console.error("❌Error deleting repository:", error)
       }
     }
   },

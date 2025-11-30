@@ -136,6 +136,29 @@ const projectController = {
     }
   },
 
+  async getCriteria(req, res, next) {
+    try {
+      const { projectId } = req.params
+
+      const project = await Project.findById(projectId)
+      if (!project) {
+        return res.status(404).json({
+          error: "PROJECT_NOT_FOUND",
+          message: "Project not found",
+        })
+      }
+
+      const criteria = await ProjectCriteria.findByProjectId(projectId)
+
+      res.json({
+        success: true,
+        criteria,
+      })
+    } catch (error) {
+      next(error)
+    }
+  },
+
   async addCriteria(req, res, next) {
     try {
       const { projectId } = req.params

@@ -14,6 +14,7 @@ router.put("/:id", projectController.updateProject)
 router.delete("/:id", projectController.deleteProject)
 
 // Criteria management
+router.get("/:projectId/criteria", projectController.getCriteria)
 router.post("/:projectId/criteria", projectController.addCriteria)
 router.put("/criteria/:criteriaId", projectController.updateCriteria)
 router.delete("/criteria/:criteriaId", projectController.deleteCriteria)

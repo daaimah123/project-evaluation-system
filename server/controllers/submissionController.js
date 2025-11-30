@@ -86,7 +86,7 @@ const submissionController = {
       }
 
       // Check repository accessibility
-      console.log("Checking GitHub repository access...")
+      console.log("🔦Checking GitHub repository access...")
       const accessCheck = await githubService.checkRepoAccess(github_repo_url)
 
       if (!accessCheck.accessible) {

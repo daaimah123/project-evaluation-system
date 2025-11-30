@@ -73,7 +73,7 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
         setCriteria([createEmptyCriterion()])
       }
     } catch (error) {
-      console.error("Failed to load criteria:", error)
+      console.error("❌Failed to load criteria:", error)
       setCriteria([createEmptyCriterion()])
     }
   }
