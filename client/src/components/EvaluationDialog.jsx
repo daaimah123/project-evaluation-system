@@ -23,12 +23,37 @@ export const EvaluationDialog = ({ open, onClose, submission }) => {
   const [evaluation, setEvaluation] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [pollingInterval, setPollingInterval] = useState(null)
 
   useEffect(() => {
     if (open && submission?.id) {
       loadEvaluation()
+      if (submission.status === "pending" || submission.status === "evaluating") {
+        startPolling()
+      }
+    } else {
+      stopPolling()
     }
+
+    return () => stopPolling()
   }, [open, submission])
+
+  const startPolling = () => {
+    if (pollingInterval) return // Already polling
+
+    const interval = setInterval(() => {
+      loadEvaluation()
+    }, 5000) // Poll every 5 seconds
+
+    setPollingInterval(interval)
+  }
+
+  const stopPolling = () => {
+    if (pollingInterval) {
+      clearInterval(pollingInterval)
+      setPollingInterval(null)
+    }
+  }
 
   const loadEvaluation = async () => {
     try {
@@ -36,12 +61,29 @@ export const EvaluationDialog = ({ open, onClose, submission }) => {
       setError(null)
       const response = await submissionService.getEvaluation(submission.id)
       setEvaluation(response.evaluation || null)
+      stopPolling()
     } catch (err) {
       console.error("Failed to load evaluation:", err)
       if (err.response?.status === 404) {
-        setError("Evaluation not yet available. Check back soon.")
+        const hint = err.response?.data?.hint
+        const status = err.response?.data?.submissionStatus || submission?.status
+
+        if (status === "pending") {
+          setError("Evaluation is queued. The worker processes jobs every 30 seconds. Expected wait: 30-60 seconds.")
+        } else if (status === "evaluating") {
+          setError(
+            "Evaluation in progress. Analyzing repository and generating AI feedback. Expected time: 1-3 minutes. This dialog will auto-refresh.",
+          )
+        } else if (status === "evaluation_failed") {
+          setError("Evaluation failed. Please check the server logs or contact support.")
+          stopPolling()
+        } else {
+          setError(hint || "Evaluation not yet available. Check back soon.")
+          stopPolling()
+        }
       } else {
-        setError("Failed to load evaluation")
+        setError("Failed to load evaluation. Please try again.")
+        stopPolling()
       }
     } finally {
       setLoading(false)

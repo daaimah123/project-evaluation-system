@@ -31,7 +31,17 @@ export const SubmissionsPage = () => {
 
   useEffect(() => {
     loadSubmissions()
-  }, [])
+
+    // Refresh submissions every 10 seconds if any are pending or evaluating
+    const interval = setInterval(() => {
+      const hasActiveEvaluations = submissions.some((sub) => sub.status === "pending" || sub.status === "evaluating")
+      if (hasActiveEvaluations) {
+        loadSubmissions()
+      }
+    }, 10000)
+
+    return () => clearInterval(interval)
+  }, [submissions])
 
   const loadSubmissions = async () => {
     try {
@@ -76,6 +86,7 @@ export const SubmissionsPage = () => {
       staff_reviewing: "warning",
       staff_approved: "success",
       ready_to_share: "success",
+      evaluation_failed: "error", // Add error color for failed evaluations
     }
     return colors[status] || "default"
   }

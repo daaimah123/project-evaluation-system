@@ -29,6 +29,7 @@ export const SubmissionForm = ({ open, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [accessCheckResult, setAccessCheckResult] = useState(null)
+  const [successMessage, setSuccessMessage] = useState(null)
 
   useEffect(() => {
     if (open) {
@@ -62,6 +63,7 @@ export const SubmissionForm = ({ open, onClose, onSuccess }) => {
     setFormData((prev) => ({ ...prev, [name]: value }))
     setError(null)
     setAccessCheckResult(null)
+    setSuccessMessage(null)
   }
 
   const handleSubmit = async (e) => {
@@ -69,13 +71,20 @@ export const SubmissionForm = ({ open, onClose, onSuccess }) => {
     setLoading(true)
     setError(null)
     setAccessCheckResult(null)
+    setSuccessMessage(null)
 
     try {
       const response = await submissionService.create(formData)
       console.log("Submission created:", response)
 
       if (response.success) {
-        onSuccess()
+        setSuccessMessage(
+          "Submission created successfully! The evaluation has been queued and will begin processing shortly (30-60 seconds). The evaluation typically takes 1-3 minutes to complete.",
+        )
+
+        setTimeout(() => {
+          onSuccess()
+        }, 3000)
       }
     } catch (err) {
       console.error("Submission error:", err)
@@ -106,6 +115,7 @@ export const SubmissionForm = ({ open, onClose, onSuccess }) => {
     })
     setError(null)
     setAccessCheckResult(null)
+    setSuccessMessage(null)
     onClose()
   }
 
@@ -115,6 +125,8 @@ export const SubmissionForm = ({ open, onClose, onSuccess }) => {
       <form onSubmit={handleSubmit}>
         <DialogContent>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {successMessage && <Alert severity="success">{successMessage}</Alert>}
+
             {error && <Alert severity="error">{error}</Alert>}
 
             {accessCheckResult && !accessCheckResult.accessible && (
@@ -137,6 +149,7 @@ export const SubmissionForm = ({ open, onClose, onSuccess }) => {
               value={formData.participant_id}
               onChange={handleChange}
               required
+              disabled={loading || successMessage}
             >
               <MenuItem value="">Select Participant</MenuItem>
               {participants.map((participant) => (
@@ -154,6 +167,7 @@ export const SubmissionForm = ({ open, onClose, onSuccess }) => {
               value={formData.project_id}
               onChange={handleChange}
               required
+              disabled={loading || successMessage}
             >
               <MenuItem value="">Select Project</MenuItem>
               {projects.map((project) => (
@@ -171,6 +185,7 @@ export const SubmissionForm = ({ open, onClose, onSuccess }) => {
               onChange={handleChange}
               placeholder="https://github.com/username/repo"
               required
+              disabled={loading || successMessage}
             />
 
             <TextField
@@ -181,16 +196,19 @@ export const SubmissionForm = ({ open, onClose, onSuccess }) => {
               name="notes_from_participant"
               value={formData.notes_from_participant}
               onChange={handleChange}
+              disabled={loading || successMessage}
             />
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} disabled={loading}>
-            Cancel
+            {successMessage ? "Close" : "Cancel"}
           </Button>
-          <Button type="submit" variant="contained" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : "Submit"}
-          </Button>
+          {!successMessage && (
+            <Button type="submit" variant="contained" disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : "Submit"}
+            </Button>
+          )}
         </DialogActions>
       </form>
     </Dialog>
