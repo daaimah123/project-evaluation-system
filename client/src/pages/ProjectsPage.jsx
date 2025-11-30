@@ -35,10 +35,21 @@ export const ProjectsPage = () => {
     try {
       setLoading(true)
       const data = await projectService.getAll()
-      setProjects(data)
+      console.log("Projects API response:", data)
+
+      // Handle different response formats
+      if (Array.isArray(data)) {
+        setProjects(data)
+      } else if (data && Array.isArray(data.projects)) {
+        setProjects(data.projects)
+      } else {
+        console.error("Unexpected projects response format:", data)
+        setProjects([])
+      }
     } catch (error) {
       toast.error("Failed to load projects")
-      console.error(error)
+      console.error("Error loading projects:", error)
+      setProjects([])
     } finally {
       setLoading(false)
     }
@@ -158,3 +169,4 @@ export const ProjectsPage = () => {
     </Box>
   )
 }
+
