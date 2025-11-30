@@ -40,15 +40,15 @@ class ProjectCriteria {
       [
         project_id,
         criterion_name,
-        category,
-        display_order,
-        what_to_check,
-        JSON.stringify(files_to_examine),
+        category || "General",
+        display_order || 0,
+        what_to_check || "",
+        files_to_examine ? JSON.stringify(files_to_examine) : "[]",
         rubric_4,
         rubric_3,
         rubric_2,
         rubric_1,
-        weight,
+        weight || 1,
       ],
     )
 
@@ -89,7 +89,7 @@ class ProjectCriteria {
         category,
         display_order,
         what_to_check,
-        JSON.stringify(files_to_examine),
+        files_to_examine ? JSON.stringify(files_to_examine) : "[]",
         rubric_4,
         rubric_3,
         rubric_2,
@@ -108,7 +108,6 @@ class ProjectCriteria {
   }
 
   static async bulkCreate(projectId, criteriaArray) {
-    // Create multiple criteria for a project
     const created = []
 
     for (const criteria of criteriaArray) {

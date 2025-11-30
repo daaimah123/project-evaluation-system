@@ -80,12 +80,12 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
 
   const createEmptyCriterion = () => ({
     category: "",
-    criterion: "",
+    criterion_name: "",
     weight: 1,
-    level_1_description: "",
-    level_2_description: "",
-    level_3_description: "",
-    level_4_description: "",
+    rubric_1: "",
+    rubric_2: "",
+    rubric_3: "",
+    rubric_4: "",
   })
 
   const handleChange = (e) => {
@@ -151,11 +151,11 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
 
     for (let i = 0; i < criteria.length; i++) {
       const c = criteria[i]
-      if (!c.category || !c.criterion) {
+      if (!c.category || !c.criterion_name) {
         toast.error(`Criterion ${i + 1}: Category and criterion name are required`)
         return false
       }
-      if (!c.level_1_description || !c.level_2_description || !c.level_3_description || !c.level_4_description) {
+      if (!c.rubric_1 || !c.rubric_2 || !c.rubric_3 || !c.rubric_4) {
         toast.error(`Criterion ${i + 1}: All rubric levels (1-4) must be filled`)
         return false
       }
@@ -180,11 +180,16 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
         toast.success("Project updated successfully")
       } else {
         const newProject = await projectService.create(formData)
-        projectId = newProject.id
+        projectId = newProject.id || newProject.project?.id
         toast.success("Project created successfully")
       }
 
-      // Create criteria
+      // Ensure projectId exists before creating criteria
+      if (!projectId) {
+        throw new Error("Failed to get project ID")
+      }
+
+      // Create criteria for new criteria that don't have IDs
       for (const criterion of criteria) {
         if (!criterion.id) {
           await projectService.createCriterion(projectId, criterion)
@@ -193,7 +198,7 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
 
       onSuccess()
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to save project")
+      toast.error(error.response?.data?.message || error.message || "Failed to save project")
       console.error(error)
     } finally {
       setLoading(false)
@@ -327,8 +332,8 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
                 <TextField
                   fullWidth
                   label="Criterion Name"
-                  value={criterion.criterion}
-                  onChange={(e) => handleCriterionChange(index, "criterion", e.target.value)}
+                  value={criterion.criterion_name}
+                  onChange={(e) => handleCriterionChange(index, "criterion_name", e.target.value)}
                   required
                 />
               </Grid>
@@ -353,8 +358,8 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
                 <TextField
                   fullWidth
                   label="Level 1 (Needs Improvement)"
-                  value={criterion.level_1_description}
-                  onChange={(e) => handleCriterionChange(index, "level_1_description", e.target.value)}
+                  value={criterion.rubric_1}
+                  onChange={(e) => handleCriterionChange(index, "rubric_1", e.target.value)}
                   multiline
                   rows={2}
                   required
@@ -364,8 +369,8 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
                 <TextField
                   fullWidth
                   label="Level 2 (Developing)"
-                  value={criterion.level_2_description}
-                  onChange={(e) => handleCriterionChange(index, "level_2_description", e.target.value)}
+                  value={criterion.rubric_2}
+                  onChange={(e) => handleCriterionChange(index, "rubric_2", e.target.value)}
                   multiline
                   rows={2}
                   required
@@ -375,8 +380,8 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
                 <TextField
                   fullWidth
                   label="Level 3 (Proficient)"
-                  value={criterion.level_3_description}
-                  onChange={(e) => handleCriterionChange(index, "level_3_description", e.target.value)}
+                  value={criterion.rubric_3}
+                  onChange={(e) => handleCriterionChange(index, "rubric_3", e.target.value)}
                   multiline
                   rows={2}
                   required
@@ -386,8 +391,8 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
                 <TextField
                   fullWidth
                   label="Level 4 (Exemplary)"
-                  value={criterion.level_4_description}
-                  onChange={(e) => handleCriterionChange(index, "level_4_description", e.target.value)}
+                  value={criterion.rubric_4}
+                  onChange={(e) => handleCriterionChange(index, "rubric_4", e.target.value)}
                   multiline
                   rows={2}
                   required

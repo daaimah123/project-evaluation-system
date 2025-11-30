@@ -9,9 +9,22 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000,
 })
 
+async function testConnection() {
+  try {
+    const client = await pool.connect()
+    await client.query("SELECT NOW()")
+    client.release()
+    console.log("✅Database connection successful")
+    return true
+  } catch (error) {
+    console.error("❌Database connection failed:", error.message)
+    throw error
+  }
+}
+
 // Test connection
 pool.on("connect", () => {
-  console.log("Database connected successfully")
+  console.log("Database client connected")
 })
 
 pool.on("error", (err) => {
@@ -20,3 +33,4 @@ pool.on("error", (err) => {
 })
 
 module.exports = pool
+module.exports.testConnection = testConnection

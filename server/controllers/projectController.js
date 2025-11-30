@@ -75,7 +75,9 @@ const projectController = {
 
       res.status(201).json({
         success: true,
+        id: completeProject.id,
         project: completeProject,
+        ...completeProject,
       })
     } catch (error) {
       next(error)
@@ -138,6 +140,17 @@ const projectController = {
     try {
       const { projectId } = req.params
       const criteriaData = req.body
+
+      const requiredFields = ["criterion_name", "category", "weight", "rubric_1", "rubric_2", "rubric_3", "rubric_4"]
+      const missingFields = requiredFields.filter((field) => !criteriaData[field])
+
+      if (missingFields.length > 0) {
+        return res.status(400).json({
+          error: "MISSING_FIELDS",
+          message: `Missing required fields: ${missingFields.join(", ")}`,
+          required: requiredFields,
+        })
+      }
 
       const project = await Project.findById(projectId)
       if (!project) {
