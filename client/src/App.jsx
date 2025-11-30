@@ -4,10 +4,13 @@ import { ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
 import { AuthProvider } from "./context/AuthContext"
-
-// Placeholder pages - will be created in next phases
-const LoginPage = () => <div>Login Page (Coming Soon)</div>
-const DashboardPage = () => <div>Dashboard (Coming Soon)</div>
+import { PrivateRoute } from "./components/PrivateRoute"
+import { Layout } from "./components/Layout"
+import { LoginPage } from "./pages/LoginPage"
+import { DashboardPage } from "./pages/DashboardPage"
+import { ProjectsPage } from "./pages/ProjectsPage"
+import { SubmissionsPage } from "./pages/SubmissionsPage"
+import { ParticipantsPage } from "./pages/ParticipantsPage"
 
 const theme = createTheme({
   palette: {
@@ -31,7 +34,46 @@ function App() {
         <Router>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <DashboardPage />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/projects"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <ProjectsPage />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/submissions"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <SubmissionsPage />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/participants"
+              element={
+                <PrivateRoute>
+                  <Layout>
+                    <ParticipantsPage />
+                  </Layout>
+                </PrivateRoute>
+              }
+            />
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </Router>
