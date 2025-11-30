@@ -40,7 +40,7 @@ class ProjectCriteria {
       [
         project_id,
         criterion_name,
-        category || "General",
+        category || "code_quality",
         display_order || 0,
         what_to_check || "",
         files_to_examine ? JSON.stringify(files_to_examine) : "[]",
@@ -48,7 +48,7 @@ class ProjectCriteria {
         rubric_3,
         rubric_2,
         rubric_1,
-        weight || 1,
+        weight || "important",
       ],
     )
 

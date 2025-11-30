@@ -199,7 +199,7 @@ const projectController = {
 
   async updateCriteria(req, res, next) {
     try {
-      const { criteriaId } = req.params
+      const { projectId, criteriaId } = req.params
       const criteriaData = req.body
 
       const existing = await ProjectCriteria.findById(criteriaId)
@@ -207,6 +207,13 @@ const projectController = {
         return res.status(404).json({
           error: "CRITERIA_NOT_FOUND",
           message: "Criteria not found",
+        })
+      }
+
+      if (existing.project_id !== projectId) {
+        return res.status(400).json({
+          error: "CRITERIA_MISMATCH",
+          message: "Criteria does not belong to this project",
         })
       }
 
@@ -223,13 +230,20 @@ const projectController = {
 
   async deleteCriteria(req, res, next) {
     try {
-      const { criteriaId } = req.params
+      const { projectId, criteriaId } = req.params
 
       const existing = await ProjectCriteria.findById(criteriaId)
       if (!existing) {
         return res.status(404).json({
           error: "CRITERIA_NOT_FOUND",
           message: "Criteria not found",
+        })
+      }
+
+      if (existing.project_id !== projectId) {
+        return res.status(400).json({
+          error: "CRITERIA_MISMATCH",
+          message: "Criteria does not belong to this project",
         })
       }
 

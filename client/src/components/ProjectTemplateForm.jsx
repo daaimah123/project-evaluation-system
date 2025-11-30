@@ -47,6 +47,7 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
   })
   const [techInput, setTechInput] = useState("")
   const [criteria, setCriteria] = useState([])
+  const [deletedCriteriaIds, setDeletedCriteriaIds] = useState([]) // Track deleted criteria IDs
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -128,11 +129,17 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
     setCriteria([...criteria, createEmptyCriterion()])
   }
 
-  const handleDeleteCriterion = (index) => {
+  const handleDeleteCriterion = async (index) => {
     if (criteria.length === 1) {
       toast.error("Must have at least one criterion")
       return
     }
+
+    const criterionToDelete = criteria[index]
+    if (criterionToDelete.id) {
+      setDeletedCriteriaIds([...deletedCriteriaIds, criterionToDelete.id])
+    }
+
     setCriteria(criteria.filter((_, i) => i !== index))
   }
 
@@ -192,14 +199,30 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
         throw new Error("Failed to get project ID")
       }
 
-      // Create criteria for new criteria that don't have IDs
-      for (const criterion of criteria) {
-        if (!criterion.id) {
-          await projectService.createCriterion(projectId, criterion)
-        } else {
-          await projectService.updateCriterion(projectId, criterion.id, criterion)
+      for (const criteriaId of deletedCriteriaIds) {
+        try {
+          await projectService.deleteCriterion(projectId, criteriaId)
+        } catch (error) {
+          console.error(`Failed to delete criterion ${criteriaId}:`, error)
         }
       }
+
+      const criteriaOperations = criteria.map(async (criterion) => {
+        try {
+          if (!criterion.id) {
+            // New criterion - create it
+            return await projectService.createCriterion(projectId, criterion)
+          } else {
+            // Existing criterion - update it
+            return await projectService.updateCriterion(projectId, criterion.id, criterion)
+          }
+        } catch (error) {
+          console.error("Criteria operation failed:", error)
+          throw error
+        }
+      })
+
+      await Promise.all(criteriaOperations)
 
       onSuccess()
     } catch (error) {

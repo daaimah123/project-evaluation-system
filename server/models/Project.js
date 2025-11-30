@@ -30,7 +30,7 @@ class Project {
        (project_number, name, description, expected_timeline_days, tech_stack)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
-      [project_number, name, description, expected_timeline_days, JSON.stringify(tech_stack)],
+      [project_number, name, description, expected_timeline_days, tech_stack || []],
     )
 
     return result.rows[0]
@@ -48,7 +48,7 @@ class Project {
            updated_at = CURRENT_TIMESTAMP
        WHERE id = $5
        RETURNING *`,
-      [name, description, expected_timeline_days, JSON.stringify(tech_stack), id],
+      [name, description, expected_timeline_days, tech_stack || [], id],
     )
 
     return result.rows[0]

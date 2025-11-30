@@ -47,7 +47,7 @@ export const ProjectsPage = () => {
         setProjects([])
       }
     } catch (error) {
-      toast.error("❌Failed to load projects")
+      toast.error("Failed to load projects")
       console.error("❌Error loading projects:", error)
       setProjects([])
     } finally {
@@ -66,16 +66,16 @@ export const ProjectsPage = () => {
   }
 
   const handleDelete = async (id) => {
-    if (!window.confirm("⚠️Are you sure you want to delete this project?")) {
+    if (!window.confirm("Are you sure you want to delete this project?")) {
       return
     }
 
     try {
       await projectService.delete(id)
-      toast.success("🚮Project deleted successfully")
+      toast.success("Project deleted successfully")
       loadProjects()
     } catch (error) {
-      toast.error("❌Failed to delete project")
+      toast.error("Failed to delete project")
       console.error(error)
     }
   }
