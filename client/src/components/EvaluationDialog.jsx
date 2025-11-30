@@ -69,13 +69,13 @@ export const EvaluationDialog = ({ open, onClose, submission }) => {
         const status = err.response?.data?.submissionStatus || submission?.status
 
         if (status === "pending") {
-          setError("Evaluation is queued and will start within 30 seconds. Expected total time: 2-4 minutes.")
+          setError("Evaluation is queued and will start within 30-60 seconds. Expected total time: 2-4 minutes.")
         } else if (status === "evaluating") {
           setError(
             "Evaluation in progress. The AI is analyzing code and generating feedback. This typically takes 1-3 minutes. Checking again in 15 seconds...",
           )
         } else if (status === "evaluation_failed") {
-          setError("Evaluation failed. Please check the server logs or try submitting again.")
+          setError("Evaluation failed. Please check the server logs for details or try submitting again.")
           stopPolling()
         } else {
           setError(hint || "Evaluation not yet available. The submission may still be processing.")

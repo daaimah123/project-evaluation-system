@@ -115,7 +115,7 @@ Return your evaluation in the following JSON format:
 
       return parsed
     } catch (error) {
-      console.error("❌Error parsing AI response:", error)
+      console.error("[v0] Error parsing AI response:", error)
       throw new Error(`Failed to parse AI response: ${error.message}`)
     }
   },
@@ -127,7 +127,7 @@ Return your evaluation in the following JSON format:
     try {
       console.log(`Generating AI evaluation for project: ${project.name}`)
 
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
 
       const prompt = this.buildEvaluationPrompt(project, sanitizedData)
 
@@ -136,7 +136,7 @@ Return your evaluation in the following JSON format:
       const response = await result.response
       const text = response.text()
 
-      console.log("🤖AI response received, parsing...")
+      console.log("✅ AI response received, parsing...")
 
       // Parse response
       const evaluation = this.parseAIResponse(text)
@@ -148,15 +148,15 @@ Return your evaluation in the following JSON format:
         ).toFixed(2)
       }
 
-      console.log(`Evaluation complete. Overall score: ${evaluation.overallScore}`)
+      console.log(`✅ Evaluation complete. Overall score: ${evaluation.overallScore}`)
 
       return {
         evaluation,
-        aiModel: "gemini-1.5-flash",
+        aiModel: "gemini-2.5-flash",
         rawResponse: text,
       }
     } catch (error) {
-      console.error("❌Error generating evaluation:", error)
+      console.error("❌ Error generating evaluation:", error)
       throw new Error(`AI evaluation failed: ${error.message}`)
     }
   },
@@ -165,7 +165,7 @@ Return your evaluation in the following JSON format:
    * Fallback evaluation if AI fails
    */
   generateFallbackEvaluation(project) {
-    console.log("⚙️Generating fallback evaluation")
+    console.log("⚠️ Generating fallback evaluation")
 
     const criteria = project.criteria || []
 
@@ -190,7 +190,7 @@ Return your evaluation in the following JSON format:
         ],
         overallScore: 0,
       },
-      aiModel: "fallback",
+      aiModel: "gemini-2.5-flash (fallback)",
       error: true,
     }
   },

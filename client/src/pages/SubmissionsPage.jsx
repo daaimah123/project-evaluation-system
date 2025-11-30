@@ -15,6 +15,7 @@ import {
   IconButton,
   Chip,
   Alert,
+  Snackbar,
 } from "@mui/material"
 import { Add as AddIcon, Visibility as ViewIcon, Delete as DeleteIcon } from "@mui/icons-material"
 import { submissionService } from "../services/submissionService"
@@ -28,6 +29,7 @@ export const SubmissionsPage = () => {
   const [formOpen, setFormOpen] = useState(false)
   const [evaluationDialogOpen, setEvaluationDialogOpen] = useState(false)
   const [selectedSubmission, setSelectedSubmission] = useState(null)
+  const [toast, setToast] = useState({ open: false, message: "", severity: "info" })
 
   useEffect(() => {
     loadSubmissions()
@@ -40,10 +42,30 @@ export const SubmissionsPage = () => {
       return
     }
 
-    // Refresh every 30 seconds if there are active evaluations
-    const interval = setInterval(() => {
-      loadSubmissions()
-    }, 30000)
+    const prevStatuses = new Map(submissions.map((sub) => [sub.id, sub.status]))
+
+    const interval = setInterval(async () => {
+      const response = await submissionService.getAll()
+      const data = Array.isArray(response) ? response : response.submissions || []
+      setSubmissions(data)
+
+      data.forEach((sub) => {
+        const prevStatus = prevStatuses.get(sub.id)
+        if (prevStatus === "evaluating" && sub.status === "ai_complete") {
+          setToast({
+            open: true,
+            message: `Evaluation completed for ${sub.participant_name}'s ${sub.project_name}`,
+            severity: "success",
+          })
+        } else if (prevStatus === "evaluating" && sub.status === "evaluation_failed") {
+          setToast({
+            open: true,
+            message: `Evaluation failed for ${sub.participant_name}'s ${sub.project_name}. Manual review required.`,
+            severity: "error",
+          })
+        }
+      })
+    }, 15000)
 
     return () => clearInterval(interval)
   }, [submissions])
@@ -91,7 +113,7 @@ export const SubmissionsPage = () => {
       staff_reviewing: "warning",
       staff_approved: "success",
       ready_to_share: "success",
-      evaluation_failed: "error", // Add error color for failed evaluations
+      evaluation_failed: "error",
     }
     return colors[status] || "default"
   }
@@ -199,6 +221,17 @@ export const SubmissionsPage = () => {
         onClose={() => setEvaluationDialogOpen(false)}
         submission={selectedSubmission}
       />
+
+      <Snackbar
+        open={toast.open}
+        autoHideDuration={6000}
+        onClose={() => setToast({ ...toast, open: false })}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert severity={toast.severity} onClose={() => setToast({ ...toast, open: false })}>
+          {toast.message}
+        </Alert>
+      </Snackbar>
     </Box>
   )
 }

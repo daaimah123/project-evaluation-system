@@ -22,12 +22,12 @@ class EvaluationWorker {
    */
   start() {
     if (this.isRunning) {
-      console.log("🏃🏽‍♀️Evaluation worker already running")
+      console.log("[v0] Evaluation worker already running")
       return
     }
 
     this.isRunning = true
-    console.log("🚀Starting evaluation worker...")
+    console.log("[v0] Starting evaluation worker...")
 
     // Process queue every 30 seconds
     this.interval = setInterval(() => {
@@ -47,7 +47,7 @@ class EvaluationWorker {
       this.interval = null
     }
     this.isRunning = false
-    console.log("🛑Evaluation worker stopped")
+    console.log("[v0] Evaluation worker stopped")
   }
 
   /**
@@ -69,8 +69,11 @@ class EvaluationWorker {
       console.error(`Evaluation failed for submission ${job.submissionId}:`, error)
       queueService.failJob(job.submissionId, error)
 
-      // Keep submission in pending state so it can be retried
-      await Submission.updateStatus(job.submissionId, "pending")
+      try {
+        await Submission.updateStatus(job.submissionId, "evaluation_failed")
+      } catch (statusError) {
+        console.error(`Failed to update submission status:`, statusError)
+      }
     }
   }
 
@@ -129,7 +132,7 @@ class EvaluationWorker {
     // Step 5: Store evaluation in database
     const evaluation = await Evaluation.create({
       submission_id: submissionId,
-      evaluation_type: aiResult.error ? "fallback" : "ai_generated",
+      evaluation_type: "ai_generated",
       overall_score: aiResult.evaluation.overallScore,
       what_worked_well: aiResult.evaluation.whatWorkedWell,
       opportunities_for_improvement: aiResult.evaluation.opportunitiesForImprovement,
@@ -137,6 +140,8 @@ class EvaluationWorker {
         commits: sanitizedData.gitStats.commitActivity,
         branches: sanitizedData.gitStats.branches,
         commitQuality: sanitizedData.gitStats.commitQuality,
+        evaluationError: aiResult.error || false,
+        errorMessage: aiResult.error ? "AI evaluation service failed, fallback evaluation used" : null,
       },
       ai_model_used: aiResult.aiModel,
       evaluated_by_staff_id: null,
