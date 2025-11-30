@@ -31,14 +31,19 @@ export const SubmissionsPage = () => {
 
   useEffect(() => {
     loadSubmissions()
+  }, [])
 
-    // Refresh submissions every 10 seconds if any are pending or evaluating
+  useEffect(() => {
+    const hasActiveEvaluations = submissions.some((sub) => sub.status === "pending" || sub.status === "evaluating")
+
+    if (!hasActiveEvaluations) {
+      return
+    }
+
+    // Refresh every 30 seconds if there are active evaluations
     const interval = setInterval(() => {
-      const hasActiveEvaluations = submissions.some((sub) => sub.status === "pending" || sub.status === "evaluating")
-      if (hasActiveEvaluations) {
-        loadSubmissions()
-      }
-    }, 10000)
+      loadSubmissions()
+    }, 30000)
 
     return () => clearInterval(interval)
   }, [submissions])

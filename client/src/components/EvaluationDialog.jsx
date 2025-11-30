@@ -43,7 +43,7 @@ export const EvaluationDialog = ({ open, onClose, submission }) => {
 
     const interval = setInterval(() => {
       loadEvaluation()
-    }, 5000) // Poll every 5 seconds
+    }, 15000)
 
     setPollingInterval(interval)
   }
@@ -69,16 +69,16 @@ export const EvaluationDialog = ({ open, onClose, submission }) => {
         const status = err.response?.data?.submissionStatus || submission?.status
 
         if (status === "pending") {
-          setError("Evaluation is queued. The worker processes jobs every 30 seconds. Expected wait: 30-60 seconds.")
+          setError("Evaluation is queued and will start within 30 seconds. Expected total time: 2-4 minutes.")
         } else if (status === "evaluating") {
           setError(
-            "Evaluation in progress. Analyzing repository and generating AI feedback. Expected time: 1-3 minutes. This dialog will auto-refresh.",
+            "Evaluation in progress. The AI is analyzing code and generating feedback. This typically takes 1-3 minutes. Checking again in 15 seconds...",
           )
         } else if (status === "evaluation_failed") {
-          setError("Evaluation failed. Please check the server logs or contact support.")
+          setError("Evaluation failed. Please check the server logs or try submitting again.")
           stopPolling()
         } else {
-          setError(hint || "Evaluation not yet available. Check back soon.")
+          setError(hint || "Evaluation not yet available. The submission may still be processing.")
           stopPolling()
         }
       } else {
