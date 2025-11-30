@@ -46,7 +46,7 @@ function validateEnv() {
     console.warn("")
   }
 
-  console.log("✅Environment variables validated\n")
+  console.log("✅Environment variables validated")
 }
 
 module.exports = validateEnv
