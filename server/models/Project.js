@@ -25,12 +25,14 @@ class Project {
   static async create(projectData) {
     const { project_number, name, description, expected_timeline_days, tech_stack } = projectData
 
+    const techStackJson = tech_stack && tech_stack.length > 0 ? JSON.stringify(tech_stack) : "[]"
+
     const result = await pool.query(
       `INSERT INTO projects 
        (project_number, name, description, expected_timeline_days, tech_stack)
-       VALUES ($1, $2, $3, $4, $5)
+       VALUES ($1, $2, $3, $4, $5::jsonb)
        RETURNING *`,
-      [project_number, name, description, expected_timeline_days, tech_stack || []],
+      [project_number, name, description, expected_timeline_days, techStackJson],
     )
 
     return result.rows[0]
@@ -39,16 +41,18 @@ class Project {
   static async update(id, projectData) {
     const { name, description, expected_timeline_days, tech_stack } = projectData
 
+    const techStackJson = tech_stack && tech_stack.length > 0 ? JSON.stringify(tech_stack) : "[]"
+
     const result = await pool.query(
       `UPDATE projects 
        SET name = $1, 
            description = $2, 
            expected_timeline_days = $3, 
-           tech_stack = $4,
+           tech_stack = $4::jsonb,
            updated_at = CURRENT_TIMESTAMP
        WHERE id = $5
        RETURNING *`,
-      [name, description, expected_timeline_days, tech_stack || [], id],
+      [name, description, expected_timeline_days, techStackJson, id],
     )
 
     return result.rows[0]

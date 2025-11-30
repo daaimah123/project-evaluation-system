@@ -31,6 +31,8 @@ class ProjectCriteria {
       weight,
     } = criteriaData
 
+    const filesToExamine = Array.isArray(files_to_examine) ? JSON.stringify(files_to_examine) : files_to_examine || "[]"
+
     const result = await pool.query(
       `INSERT INTO project_criteria 
        (project_id, criterion_name, category, display_order, what_to_check, 
@@ -43,7 +45,7 @@ class ProjectCriteria {
         category || "code_quality",
         display_order || 0,
         what_to_check || "",
-        files_to_examine ? JSON.stringify(files_to_examine) : "[]",
+        filesToExamine,
         rubric_4,
         rubric_3,
         rubric_2,
@@ -69,6 +71,8 @@ class ProjectCriteria {
       weight,
     } = criteriaData
 
+    const filesToExamine = Array.isArray(files_to_examine) ? JSON.stringify(files_to_examine) : files_to_examine || "[]"
+
     const result = await pool.query(
       `UPDATE project_criteria 
        SET criterion_name = $1,
@@ -89,7 +93,7 @@ class ProjectCriteria {
         category,
         display_order,
         what_to_check,
-        files_to_examine ? JSON.stringify(files_to_examine) : "[]",
+        filesToExamine,
         rubric_4,
         rubric_3,
         rubric_2,

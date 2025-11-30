@@ -12,13 +12,31 @@ export const projectService = {
   },
 
   async create(projectData) {
-    const response = await api.post("/api/projects", projectData)
-    return response.data
+    console.log("projectService.create called with:", projectData)
+    try {
+      const response = await api.post("/api/projects", projectData)
+      console.log("projectService.create response:", response)
+      console.log("projectService.create response.data:", response.data)
+      return response.data
+    } catch (error) {
+      console.error("projectService.create error:", error)
+      console.error("projectService.create error.response:", error.response?.data)
+      throw error
+    }
   },
 
   async update(id, projectData) {
-    const response = await api.put(`/api/projects/${id}`, projectData)
-    return response.data.project || response.data
+    console.log("projectService.update called with:", id, projectData)
+    try {
+      const response = await api.put(`/api/projects/${id}`, projectData)
+      console.log("projectService.update response:", response)
+      console.log("projectService.update response.data:", response.data)
+      return response.data.project || response.data
+    } catch (error) {
+      console.error("projectService.update error:", error)
+      console.error("projectService.update error.response:", error.response?.data)
+      throw error
+    }
   },
 
   async delete(id) {
@@ -32,13 +50,29 @@ export const projectService = {
   },
 
   async createCriterion(projectId, criterionData) {
-    const response = await api.post(`/api/projects/${projectId}/criteria`, criterionData)
-    return response.data.criteria || response.data
+    console.log("projectService.createCriterion called with:", projectId, criterionData)
+    try {
+      const response = await api.post(`/api/projects/${projectId}/criteria`, criterionData)
+      console.log("projectService.createCriterion response:", response.data)
+      return response.data.criteria || response.data
+    } catch (error) {
+      console.error("projectService.createCriterion error:", error)
+      console.error("projectService.createCriterion error.response:", error.response?.data)
+      throw error
+    }
   },
 
   async updateCriterion(projectId, criterionId, criterionData) {
-    const response = await api.put(`/api/projects/${projectId}/criteria/${criterionId}`, criterionData)
-    return response.data.criteria || response.data
+    console.log("projectService.updateCriterion called with:", projectId, criterionId, criterionData)
+    try {
+      const response = await api.put(`/api/projects/${projectId}/criteria/${criterionId}`, criterionData)
+      console.log("projectService.updateCriterion response:", response.data)
+      return response.data.criteria || response.data
+    } catch (error) {
+      console.error("projectService.updateCriterion error:", error)
+      console.error("projectService.updateCriterion error.response:", error.response?.data)
+      throw error
+    }
   },
 
   async deleteCriterion(projectId, criterionId) {

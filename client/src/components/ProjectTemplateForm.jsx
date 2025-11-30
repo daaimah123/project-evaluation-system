@@ -177,57 +177,85 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    if (!validateForm()) return
+    console.log("Form submission started")
+    console.log("Form data:", formData)
+    console.log("Criteria:", criteria)
+    console.log("Project ID:", project?.id)
+
+    if (!validateForm()) {
+      console.log("Form validation failed")
+      return
+    }
 
     setLoading(true)
 
     try {
-      // Create or update project
       let projectId
       if (project?.id) {
+        console.log("Updating existing project:", project.id)
         await projectService.update(project.id, formData)
         projectId = project.id
-        toast.success("Project updated successfully")
       } else {
+        console.log("Creating new project")
         const newProject = await projectService.create(formData)
+        console.log("Create response:", newProject)
         projectId = newProject.id || newProject.project?.id
-        toast.success("Project created successfully")
       }
 
-      // Ensure projectId exists before creating criteria
+      console.log("Project ID obtained:", projectId)
+
       if (!projectId) {
-        throw new Error("Failed to get project ID")
+        throw new Error("Failed to get project ID from response")
       }
 
-      for (const criteriaId of deletedCriteriaIds) {
-        try {
-          await projectService.deleteCriterion(projectId, criteriaId)
-        } catch (error) {
-          console.error(`Failed to delete criterion ${criteriaId}:`, error)
+      if (deletedCriteriaIds.length > 0) {
+        console.log("Deleting criteria:", deletedCriteriaIds)
+        for (const criteriaId of deletedCriteriaIds) {
+          try {
+            await projectService.deleteCriterion(projectId, criteriaId)
+            console.log("Deleted criterion:", criteriaId)
+          } catch (error) {
+            console.error(`Failed to delete criterion ${criteriaId}:`, error)
+            toast.error(`Failed to delete criterion ${criteriaId}`)
+          }
         }
       }
 
-      const criteriaOperations = criteria.map(async (criterion) => {
+      console.log("Processing criteria:", criteria.length)
+      for (let i = 0; i < criteria.length; i++) {
+        const criterion = criteria[i]
+        console.log(`Processing criterion ${i + 1}/${criteria.length}:`, {
+          id: criterion.id,
+          name: criterion.criterion_name,
+          category: criterion.category,
+        })
+
         try {
           if (!criterion.id) {
-            // New criterion - create it
-            return await projectService.createCriterion(projectId, criterion)
+            console.log(`Creating new criterion ${i + 1}`)
+            const result = await projectService.createCriterion(projectId, criterion)
+            console.log(`Created criterion ${i + 1}:`, result)
           } else {
-            // Existing criterion - update it
-            return await projectService.updateCriterion(projectId, criterion.id, criterion)
+            console.log(`Updating existing criterion ${i + 1}`)
+            const result = await projectService.updateCriterion(projectId, criterion.id, criterion)
+            console.log(`Updated criterion ${i + 1}:`, result)
           }
         } catch (error) {
-          console.error("Criteria operation failed:", error)
+          console.error(`Failed to process criterion ${i + 1}:`, error)
+          console.error(`Error details:`, error.response?.data || error.message)
+          toast.error(`Failed to save criterion ${i + 1}: ${criterion.criterion_name}`)
           throw error
         }
-      })
+      }
 
-      await Promise.all(criteriaOperations)
-
+      console.log("All operations completed successfully")
+      toast.success(project ? "Project updated successfully" : "Project created successfully")
       onSuccess()
     } catch (error) {
+      console.error("Form submission error:", error)
+      console.error("Error response:", error.response?.data)
+      console.error("Error message:", error.message)
       toast.error(error.response?.data?.message || error.message || "Failed to save project")
-      console.error(error)
     } finally {
       setLoading(false)
     }

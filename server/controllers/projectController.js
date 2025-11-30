@@ -39,6 +39,8 @@ const projectController = {
     try {
       const { project_number, name, description, expected_timeline_days, tech_stack, criteria } = req.body
 
+      console.log("Creating project:", { project_number, name })
+
       // Validate required fields
       if (!project_number || !name || !description) {
         return res.status(400).json({
@@ -50,6 +52,7 @@ const projectController = {
       // Check if project number already exists
       const existing = await Project.findByNumber(project_number)
       if (existing) {
+        console.log("Project number already exists:", project_number)
         return res.status(409).json({
           error: "PROJECT_EXISTS",
           message: `Project #${project_number} already exists`,
@@ -65,8 +68,11 @@ const projectController = {
         tech_stack: tech_stack || [],
       })
 
+      console.log("Project created:", project.id)
+
       // Create criteria if provided
       if (criteria && Array.isArray(criteria) && criteria.length > 0) {
+        console.log("Creating criteria:", criteria.length)
         await ProjectCriteria.bulkCreate(project.id, criteria)
       }
 
@@ -77,9 +83,9 @@ const projectController = {
         success: true,
         id: completeProject.id,
         project: completeProject,
-        ...completeProject,
       })
     } catch (error) {
+      console.error("Project creation error:", error)
       next(error)
     }
   },
@@ -88,6 +94,8 @@ const projectController = {
     try {
       const { id } = req.params
       const { name, description, expected_timeline_days, tech_stack } = req.body
+
+      console.log("Updating project:", id)
 
       const project = await Project.findById(id)
       if (!project) {
@@ -104,11 +112,14 @@ const projectController = {
         tech_stack,
       })
 
+      console.log("Project updated:", id)
+
       res.json({
         success: true,
         project: updated,
       })
     } catch (error) {
+      console.error("Project update error:", error)
       next(error)
     }
   },
@@ -164,6 +175,8 @@ const projectController = {
       const { projectId } = req.params
       const criteriaData = req.body
 
+      console.log("Adding criteria to project:", projectId)
+
       const requiredFields = ["criterion_name", "category", "weight", "rubric_1", "rubric_2", "rubric_3", "rubric_4"]
       const missingFields = requiredFields.filter((field) => !criteriaData[field])
 
@@ -188,11 +201,14 @@ const projectController = {
         ...criteriaData,
       })
 
+      console.log("Criteria created:", criteria.id)
+
       res.status(201).json({
         success: true,
         criteria,
       })
     } catch (error) {
+      console.error("Add criteria error:", error)
       next(error)
     }
   },
@@ -201,6 +217,8 @@ const projectController = {
     try {
       const { projectId, criteriaId } = req.params
       const criteriaData = req.body
+
+      console.log("Updating criteria:", criteriaId, "for project:", projectId)
 
       const existing = await ProjectCriteria.findById(criteriaId)
       if (!existing) {
@@ -219,11 +237,14 @@ const projectController = {
 
       const updated = await ProjectCriteria.update(criteriaId, criteriaData)
 
+      console.log("Criteria updated:", criteriaId)
+
       res.json({
         success: true,
         criteria: updated,
       })
     } catch (error) {
+      console.error("Update criteria error:", error)
       next(error)
     }
   },
@@ -231,6 +252,8 @@ const projectController = {
   async deleteCriteria(req, res, next) {
     try {
       const { projectId, criteriaId } = req.params
+
+      console.log("Deleting criteria:", criteriaId, "from project:", projectId)
 
       const existing = await ProjectCriteria.findById(criteriaId)
       if (!existing) {
@@ -249,11 +272,14 @@ const projectController = {
 
       await ProjectCriteria.delete(criteriaId)
 
+      console.log("Criteria deleted:", criteriaId)
+
       res.json({
         success: true,
         message: "Criteria deleted successfully",
       })
     } catch (error) {
+      console.error("Delete criteria error:", error)
       next(error)
     }
   },
