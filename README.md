@@ -104,9 +104,9 @@ npm run dev
 - [X] Phase 3: GitHub integration with access checking
 - [X] Phase 4: Sanitization and AI evaluation
 - [X] Phase 5: Submission and evaluation flow
-- [ ] Phase 6: Frontend foundation
-- [ ] Phase 7: Project template UI
-- [ ] Phase 8: Submission UI
+- [X] Phase 6: Frontend foundation
+- [X] Phase 7: Project template UI
+- [X] Phase 8: Submission UI
 - [ ] Phase 9: Evaluation review UI
 - [ ] Phase 10: Dashboard and analytics
 - [ ] Phase 11: Polish and deploy
@@ -119,11 +119,13 @@ MIT
 ## Test Backend API
 
 #### 1. Test Login (Get JWT Token)
+
 ```bash
 curl -X POST http://localhost:5000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@techtonica.org","password":"admin123"}'
 ```
+
 **Expected response:**
 
 ```json
