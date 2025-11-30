@@ -59,11 +59,20 @@ export const EvaluationDialog = ({ open, onClose, submission }) => {
     try {
       setLoading(true)
       setError(null)
+
+      console.log("Loading evaluation for submission:", submission.id)
+
       const response = await submissionService.getEvaluation(submission.id)
+
+      console.log("Evaluation response:", response)
+      console.log("Evaluation data:", response.evaluation)
+
       setEvaluation(response.evaluation || null)
       stopPolling()
     } catch (err) {
       console.error("Failed to load evaluation:", err)
+      console.error("Error response:", err.response?.data)
+
       if (err.response?.status === 404) {
         const hint = err.response?.data?.hint
         const status = err.response?.data?.submissionStatus || submission?.status
@@ -115,6 +124,26 @@ export const EvaluationDialog = ({ open, onClose, submission }) => {
           <Alert severity="info">{error}</Alert>
         ) : evaluation ? (
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            {process.env.NODE_ENV === "development" && (
+              <Alert severity="info" sx={{ fontSize: "0.75rem" }}>
+                <Typography variant="caption" component="div">
+                  <strong>Debug Info:</strong>
+                </Typography>
+                <Typography variant="caption" component="div">
+                  Overall Score: {JSON.stringify(evaluation.overall_score)}
+                </Typography>
+                <Typography variant="caption" component="div">
+                  Strengths: {JSON.stringify(evaluation.what_worked_well?.length || 0)}
+                </Typography>
+                <Typography variant="caption" component="div">
+                  Improvements: {JSON.stringify(evaluation.opportunities_for_improvement?.length || 0)}
+                </Typography>
+                <Typography variant="caption" component="div">
+                  Criterion Scores: {JSON.stringify(evaluation.criterion_scores?.length || 0)}
+                </Typography>
+              </Alert>
+            )}
+
             <Box>
               <Typography variant="h6" gutterBottom>
                 Overall Score

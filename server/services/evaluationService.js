@@ -1,4 +1,6 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai")
+const fs = require("fs")
+const path = require("path")
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
 const evaluationService = {
@@ -11,8 +13,8 @@ const evaluationService = {
 
     // Build file content section
     const fileSection = files
-      .slice(0, 20)
-      .map((f) => `--- ${f.path} ---\n${f.content.substring(0, 1000)}\n`)
+      .slice(0, 30) // Increased from 20 to 30 files
+      .map((f) => `--- ${f.path} ---\n${f.content.substring(0, 5000)}\n`) // Increased from 1000 to 5000 chars
       .join("\n")
 
     const prompt = `You are evaluating a software engineering project submission.
@@ -45,7 +47,7 @@ Scoring Rubric:
   )
   .join("\n")}
 
-CODE FILES (Sanitized, First 20 files):
+CODE FILES (Sanitized, First 30 files, up to 5000 chars each):
 ${fileSection}
 
 INSTRUCTIONS:
@@ -125,18 +127,51 @@ Return your evaluation in the following JSON format:
    */
   async generateEvaluation(project, sanitizedData) {
     try {
-      console.log(`Generating AI evaluation for project: ${project.name}`)
+      console.log(`\n🤖 GEMINI AI EVALUATION STARTING...`)
+      console.log(`Project: ${project.name}`)
+      console.log(`Files to analyze: ${sanitizedData.files.length}`)
 
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
 
       const prompt = this.buildEvaluationPrompt(project, sanitizedData)
+
+      console.log(`📝 Prompt prepared:`)
+      console.log(`  - Length: ${prompt.length} characters`)
+      console.log(`  - Files included: ${Math.min(30, sanitizedData.files.length)}`)
+      console.log(`  - Criteria count: ${project.criteria?.length || 0}`)
+
+      const logsDir = path.join(__dirname, "..", "logs", "evaluations")
+      if (!fs.existsSync(logsDir)) {
+        fs.mkdirSync(logsDir, { recursive: true })
+      }
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-")
+      const promptFile = path.join(logsDir, `prompt_${timestamp}.txt`)
+      fs.writeFileSync(promptFile, prompt, "utf8")
+      console.log(`📄 Full prompt saved to: ${promptFile}`)
+
+      console.log(`\n⏳ Sending request to Gemini API...`)
+      const startTime = Date.now()
 
       // Generate evaluation
       const result = await model.generateContent(prompt)
       const response = await result.response
       const text = response.text()
 
-      console.log("✅ AI response received, parsing...")
+      const duration = ((Date.now() - startTime) / 1000).toFixed(2)
+      console.log(`✓ Gemini response received in ${duration} seconds`)
+      console.log(`  - Response length: ${text.length} characters`)
+
+      const responseFile = path.join(logsDir, `response_${timestamp}.json`)
+      fs.writeFileSync(responseFile, text, "utf8")
+      console.log(`📄 Full response saved to: ${responseFile}`)
+
+      console.log(`\n📋 FULL GEMINI RESPONSE:`)
+      console.log("=".repeat(80))
+      console.log(text)
+      console.log("=".repeat(80))
+
+      console.log(`\n🔍 Parsing AI response...`)
 
       // Parse response
       const evaluation = this.parseAIResponse(text)
@@ -148,7 +183,11 @@ Return your evaluation in the following JSON format:
         ).toFixed(2)
       }
 
-      console.log(`✅ Evaluation complete. Overall score: ${evaluation.overallScore}`)
+      console.log(`✅ Parsing complete:`)
+      console.log(`  - Overall score: ${evaluation.overallScore}`)
+      console.log(`  - Criterion scores: ${evaluation.criterionScores.length}`)
+      console.log(`  - Strengths: ${evaluation.whatWorkedWell?.length || 0}`)
+      console.log(`  - Improvements: ${evaluation.opportunitiesForImprovement?.length || 0}`)
 
       return {
         evaluation,
@@ -156,7 +195,9 @@ Return your evaluation in the following JSON format:
         rawResponse: text,
       }
     } catch (error) {
-      console.error("❌ Error generating evaluation:", error)
+      console.error(`\n❌ GEMINI AI ERROR:`, error.message)
+      console.error(`Error type:`, error.constructor.name)
+      console.error(`Full error:`, error)
       throw new Error(`AI evaluation failed: ${error.message}`)
     }
   },
