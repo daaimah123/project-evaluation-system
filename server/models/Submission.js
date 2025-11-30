@@ -4,7 +4,7 @@ class Submission {
   static async findAll(filters = {}) {
     let query = `
       SELECT s.*, 
-             p.name as participant_name, 
+             CONCAT(p.first_name, ' ', p.last_name) as participant_name,
              p.email as participant_email,
              pr.name as project_name,
              pr.project_number
@@ -43,7 +43,7 @@ class Submission {
   static async findById(id) {
     const result = await pool.query(
       `SELECT s.*, 
-              p.name as participant_name, 
+              CONCAT(p.first_name, ' ', p.last_name) as participant_name,
               p.email as participant_email,
               pr.name as project_name,
               pr.project_number

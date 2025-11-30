@@ -14,18 +14,25 @@ const evaluationController = {
         })
       }
 
-      const evaluation = await Evaluation.getWithScores(submissionId)
+      const evaluation = await Evaluation.findBySubmissionId(submissionId)
 
       if (!evaluation) {
         return res.status(404).json({
           error: "EVALUATION_NOT_FOUND",
           message: "No evaluation found for this submission",
+          submissionStatus: submission.status,
+          hint:
+            submission.status === "pending" || submission.status === "evaluating"
+              ? "Evaluation is still in progress. Please check back in a few moments."
+              : "Evaluation may have failed. Please contact support.",
         })
       }
 
+      const evaluationWithScores = await Evaluation.getWithScores(evaluation.id)
+
       res.json({
         success: true,
-        evaluation,
+        evaluation: evaluationWithScores,
       })
     } catch (error) {
       next(error)

@@ -40,9 +40,11 @@ class Evaluation {
         submission_id,
         evaluation_type,
         overall_score,
-        JSON.stringify(what_worked_well),
-        JSON.stringify(opportunities_for_improvement),
-        JSON.stringify(development_observations),
+        Array.isArray(what_worked_well) ? JSON.stringify(what_worked_well) : what_worked_well,
+        Array.isArray(opportunities_for_improvement)
+          ? JSON.stringify(opportunities_for_improvement)
+          : opportunities_for_improvement,
+        Array.isArray(development_observations) ? JSON.stringify(development_observations) : development_observations,
         ai_model_used,
         evaluated_by_staff_id,
       ],
@@ -73,9 +75,11 @@ class Evaluation {
        RETURNING *`,
       [
         overall_score,
-        JSON.stringify(what_worked_well),
-        JSON.stringify(opportunities_for_improvement),
-        JSON.stringify(development_observations),
+        Array.isArray(what_worked_well) ? JSON.stringify(what_worked_well) : what_worked_well,
+        Array.isArray(opportunities_for_improvement)
+          ? JSON.stringify(opportunities_for_improvement)
+          : opportunities_for_improvement,
+        Array.isArray(development_observations) ? JSON.stringify(development_observations) : development_observations,
         evaluated_by_staff_id,
         id,
       ],
@@ -99,7 +103,7 @@ class Evaluation {
 
     return {
       ...evaluation,
-      scores: scoresResult.rows,
+      criterion_scores: scoresResult.rows,
     }
   }
 }
