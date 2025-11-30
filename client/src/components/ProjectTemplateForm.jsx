@@ -24,14 +24,17 @@ import { toast } from "react-toastify"
 import { projectService } from "../services/projectService"
 
 const CRITERION_CATEGORIES = [
-  "Technical Implementation",
-  "Code Quality",
-  "User Experience",
-  "Documentation",
-  "Testing",
-  "Performance",
-  "Security",
-  "Accessibility",
+  { value: "code_quality", label: "Code Quality" },
+  { value: "functionality", label: "Functionality" },
+  { value: "git_workflow", label: "Git Workflow" },
+  { value: "architecture", label: "Architecture" },
+  { value: "documentation", label: "Documentation" },
+]
+
+const WEIGHT_OPTIONS = [
+  { value: "critical", label: "Critical" },
+  { value: "important", label: "Important" },
+  { value: "nice_to_have", label: "Nice to Have" },
 ]
 
 export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
@@ -73,7 +76,7 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
         setCriteria([createEmptyCriterion()])
       }
     } catch (error) {
-      console.error("❌Failed to load criteria:", error)
+      console.error("Failed to load criteria:", error)
       setCriteria([createEmptyCriterion()])
     }
   }
@@ -81,7 +84,7 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
   const createEmptyCriterion = () => ({
     category: "",
     criterion_name: "",
-    weight: 1,
+    weight: "important",
     rubric_1: "",
     rubric_2: "",
     rubric_3: "",
@@ -193,6 +196,8 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
       for (const criterion of criteria) {
         if (!criterion.id) {
           await projectService.createCriterion(projectId, criterion)
+        } else {
+          await projectService.updateCriterion(projectId, criterion.id, criterion)
         }
       }
 
@@ -321,8 +326,8 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
                     onChange={(e) => handleCriterionChange(index, "category", e.target.value)}
                   >
                     {CRITERION_CATEGORIES.map((cat) => (
-                      <MenuItem key={cat} value={cat}>
-                        {cat}
+                      <MenuItem key={cat.value} value={cat.value}>
+                        {cat.label}
                       </MenuItem>
                     ))}
                   </Select>
@@ -338,14 +343,20 @@ export const ProjectTemplateForm = ({ project, onClose, onSuccess }) => {
                 />
               </Grid>
               <Grid item xs={12} sm={2}>
-                <TextField
-                  fullWidth
-                  label="Weight"
-                  type="number"
-                  value={criterion.weight}
-                  onChange={(e) => handleCriterionChange(index, "weight", Number.parseInt(e.target.value))}
-                  inputProps={{ min: 1, max: 5 }}
-                />
+                <FormControl fullWidth required>
+                  <InputLabel>Weight</InputLabel>
+                  <Select
+                    value={criterion.weight}
+                    label="Weight"
+                    onChange={(e) => handleCriterionChange(index, "weight", e.target.value)}
+                  >
+                    {WEIGHT_OPTIONS.map((opt) => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
 
               <Grid item xs={12}>

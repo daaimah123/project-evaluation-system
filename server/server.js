@@ -83,13 +83,13 @@ async function startServer() {
 
     // Graceful shutdown
     process.on("SIGTERM", () => {
-      console.log("\nSIGTERM received, shutting down gracefully...")
+      console.log("\n⚡️Signal termination received, shutting down gracefully...")
       evaluationWorker.stop()
       process.exit(0)
     })
 
     process.on("SIGINT", () => {
-      console.log("\nSIGINT received, shutting down gracefully...")
+      console.log("\n⚡️Signal interruption received, shutting down gracefully...")
       evaluationWorker.stop()
       process.exit(0)
     })

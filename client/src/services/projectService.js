@@ -35,4 +35,14 @@ export const projectService = {
     const response = await api.post(`/api/projects/${projectId}/criteria`, criterionData)
     return response.data.criteria || response.data
   },
+
+  async updateCriterion(projectId, criterionId, criterionData) {
+    const response = await api.put(`/api/projects/${projectId}/criteria/${criterionId}`, criterionData)
+    return response.data.criteria || response.data
+  },
+
+  async deleteCriterion(projectId, criterionId) {
+    const response = await api.delete(`/api/projects/${projectId}/criteria/${criterionId}`)
+    return response.data
+  },
 }
